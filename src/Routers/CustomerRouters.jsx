@@ -9,6 +9,7 @@ import ProductDetails from '../customer/components/ProductDetails/ProductDetails
 import Checkout from '../customer/components/Checkout/Checkout'
 import Order from '../customer/components/Order/Order'
 import OrderDetails from '../customer/components/Order/OrderDetails'
+import LoginForm from '../customer/Auth/LoginForm'
 const CustomerRouters = () => {
   return (
     <div>
@@ -16,6 +17,11 @@ const CustomerRouters = () => {
              <Navigation/>
         </div>
         <Routes>
+            {/* Auth */}
+            <Route path='/login' element={<HomePage/>}></Route>
+            <Route path='/register' element={<HomePage/>}></Route>
+
+
             <Route path='/' element={<HomePage/>}></Route>
             <Route path='/cart' element={<Cart/>}></Route>
             <Route path='/:lavelOne/:lavelTwo/:lavelThree' element={<Product/>}></Route>
@@ -23,7 +29,6 @@ const CustomerRouters = () => {
             <Route path='/checkout' element={<Checkout/>}></Route>
             <Route path='/account/order' element={<Order/>}></Route>
             <Route path='/account/order/:orderId' element={<OrderDetails/>}></Route>
-
         </Routes>
         <div>
             <Footer/>

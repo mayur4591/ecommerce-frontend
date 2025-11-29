@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { Fragment, useState } from 'react'
+import { Fragment, useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -18,153 +18,186 @@ import {
   TabList,
   TabPanel,
   TabPanels,
-} from '@headlessui/react'
-import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import Avatar from '@mui/material/Avatar'
-import { useNavigate } from 'react-router-dom'
+} from "@headlessui/react";
+import {
+  Bars3Icon,
+  MagnifyingGlassIcon,
+  ShoppingBagIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import Avatar from "@mui/material/Avatar";
+import { useNavigate } from "react-router-dom";
+import AuthModal from "../../Auth/AuthModal";
+import { Button } from "@mui/material";
 
 // Helper function for conditionally joining class names
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 const navigation = {
   categories: [
     {
-      id: 'women',
-      name: 'Women',
+      id: "women",
+      name: "Women",
       featured: [
         {
-          name: 'New Arrivals',
-          href: '#',
-          imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/mega-menu-category-01.jpg',
-          imageAlt: 'Models sitting back to back, wearing Basic Tee in black and bone.',
+          name: "New Arrivals",
+          href: "#",
+          imageSrc:
+            "https://tailwindcss.com/plus-assets/img/ecommerce-images/mega-menu-category-01.jpg",
+          imageAlt:
+            "Models sitting back to back, wearing Basic Tee in black and bone.",
         },
         {
-          name: 'Basic Tees',
-          href: '#',
-          imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/mega-menu-category-02.jpg',
-          imageAlt: 'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
+          name: "Basic Tees",
+          href: "#",
+          imageSrc:
+            "https://tailwindcss.com/plus-assets/img/ecommerce-images/mega-menu-category-02.jpg",
+          imageAlt:
+            "Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.",
         },
       ],
       sections: [
         {
-          id: 'clothing',
-          name: 'Clothing',
+          id: "clothing",
+          name: "Clothing",
           items: [
             // UPDATED: Added 'id' fields
-            { name: 'Tops', id: 'tops', href: '#' },
-            { name: 'Dresses', id: 'dresses', href: '#' },
-            { name: 'Pants', id: 'pants', href: '#' },
-            { name: 'Denim', id: 'denim', href: '#' },
-            { name: 'Sweaters', id: 'sweaters', href: '#' },
-            { name: 'T-Shirts', id: 't-shirts', href: '#' },
-            { name: 'Jackets', id: 'jackets', href: '#' },
-            { name: 'Activewear', id: 'activewear', href: '#' },
-            { name: 'Browse All', id: 'browse-all', href: '#' },
+            { name: "Tops", id: "tops", href: "#" },
+            { name: "Dresses", id: "dresses", href: "#" },
+            { name: "Pants", id: "pants", href: "#" },
+            { name: "Denim", id: "denim", href: "#" },
+            { name: "Sweaters", id: "sweaters", href: "#" },
+            { name: "T-Shirts", id: "t-shirts", href: "#" },
+            { name: "Jackets", id: "jackets", href: "#" },
+            { name: "Activewear", id: "activewear", href: "#" },
+            { name: "Browse All", id: "browse-all", href: "#" },
           ],
         },
         {
-          id: 'accessories',
-          name: 'Accessories',
+          id: "accessories",
+          name: "Accessories",
           items: [
             // UPDATED: Added 'id' fields
-            { name: 'Watches', id: 'watches', href: '#' },
-            { name: 'Wallets', id: 'wallets', href: '#' },
-            { name: 'Bags', id: 'bags', href: '#' },
-            { name: 'Sunglasses', id: 'sunglasses', href: '#' },
-            { name: 'Hats', id: 'hats', href: '#' },
-            { name: 'Belts', id: 'belts', href: '#' },
+            { name: "Watches", id: "watches", href: "#" },
+            { name: "Wallets", id: "wallets", href: "#" },
+            { name: "Bags", id: "bags", href: "#" },
+            { name: "Sunglasses", id: "sunglasses", href: "#" },
+            { name: "Hats", id: "hats", href: "#" },
+            { name: "Belts", id: "belts", href: "#" },
           ],
         },
         {
-          id: 'brands',
-          name: 'Brands',
+          id: "brands",
+          name: "Brands",
           items: [
             // UPDATED: Added 'id' fields
-            { name: 'Full Nelson', id: 'full-nelson', href: '#' },
-            { name: 'My Way', id: 'my-way', href: '#' },
-            { name: 'Re-Arranged', id: 're-arranged', href: '#' },
-            { name: 'Counterfeit', id: 'counterfeit', href: '#' },
-            { name: 'Significant Other', id: 'significant-other', href: '#' },
+            { name: "Full Nelson", id: "full-nelson", href: "#" },
+            { name: "My Way", id: "my-way", href: "#" },
+            { name: "Re-Arranged", id: "re-arranged", href: "#" },
+            { name: "Counterfeit", id: "counterfeit", href: "#" },
+            { name: "Significant Other", id: "significant-other", href: "#" },
           ],
         },
       ],
     },
     {
-      id: 'men',
-      name: 'Men',
+      id: "men",
+      name: "Men",
       featured: [
         {
-          name: 'New Arrivals',
-          href: '#',
+          name: "New Arrivals",
+          href: "#",
           imageSrc:
-            'https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-04-detail-product-shot-01.jpg',
-          imageAlt: 'Drawstring top with elastic loop closure and textured interior padding.',
+            "https://tailwindcss.com/plus-assets/img/ecommerce-images/product-page-04-detail-product-shot-01.jpg",
+          imageAlt:
+            "Drawstring top with elastic loop closure and textured interior padding.",
         },
         {
-          name: 'Artwork Tees',
-          href: '#',
-          imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-02-image-card-06.jpg',
+          name: "Artwork Tees",
+          href: "#",
+          imageSrc:
+            "https://tailwindcss.com/plus-assets/img/ecommerce-images/category-page-02-image-card-06.jpg",
           imageAlt:
-            'Three shirts in gray, white, and blue arranged on table with same line drawing of hands and shapes overlapping on front of shirt.',
+            "Three shirts in gray, white, and blue arranged on table with same line drawing of hands and shapes overlapping on front of shirt.",
         },
       ],
       sections: [
         {
-          id: 'clothing',
-          name: 'Clothing',
+          id: "clothing",
+          name: "Clothing",
           items: [
             // UPDATED: Added 'id' fields
-            { name: 'Tops', id: 'tops', href: '#' },
-            { name: 'Pants', id: 'pants', href: '#' },
-            { name: 'Sweaters', id: 'sweaters', href: '#' },
-            { name: 'T-Shirts', id: 't-shirts', href: '#' },
-            { name: 'Jackets', id: 'jackets', href: '#' },
-            { name: 'Activewear', id: 'activewear', href: '#' },
-            { name: 'Browse All', id: 'browse-all', href: '#' },
+            { name: "Tops", id: "tops", href: "#" },
+            { name: "Pants", id: "pants", href: "#" },
+            { name: "Sweaters", id: "sweaters", href: "#" },
+            { name: "T-Shirts", id: "t-shirts", href: "#" },
+            { name: "Jackets", id: "jackets", href: "#" },
+            { name: "Activewear", id: "activewear", href: "#" },
+            { name: "Browse All", id: "browse-all", href: "#" },
           ],
         },
         {
-          id: 'accessories',
-          name: 'Accessories',
+          id: "accessories",
+          name: "Accessories",
           items: [
             // UPDATED: Added 'id' fields
-            { name: 'Watches', id: 'watches', href: '#' },
-            { name: 'Wallets', id: 'wallets', href: '#' },
-            { name: 'Bags', id: 'bags', href: '#' },
-            { name: 'Sunglasses', id: 'sunglasses', href: '#' },
-            { name: 'Hats', id: 'hats', href: '#' },
-            { name: 'Belts', id: 'belts', href: '#' },
+            { name: "Watches", id: "watches", href: "#" },
+            { name: "Wallets", id: "wallets", href: "#" },
+            { name: "Bags", id: "bags", href: "#" },
+            { name: "Sunglasses", id: "sunglasses", href: "#" },
+            { name: "Hats", id: "hats", href: "#" },
+            { name: "Belts", id: "belts", href: "#" },
           ],
         },
         {
-          id: 'brands',
-          name: 'Brands',
+          id: "brands",
+          name: "Brands",
           items: [
             // UPDATED: Added 'id' fields
-            { name: 'Re-Arranged', id: 're-arranged', href: '#' },
-            { name: 'Counterfeit', id: 'counterfeit', href: '#' },
-            { name: 'Full Nelson', id: 'full-nelson', href: '#' },
-            { name: 'My Way', id: 'my-way', href: '#' },
+            { name: "Re-Arranged", id: "re-arranged", href: "#" },
+            { name: "Counterfeit", id: "counterfeit", href: "#" },
+            { name: "Full Nelson", id: "full-nelson", href: "#" },
+            { name: "My Way", id: "my-way", href: "#" },
           ],
         },
       ],
     },
   ],
   pages: [
-    { name: 'Company', href: '#' },
-    { name: 'Stores', href: '#' },
+    { name: "Company", href: "#" },
+    { name: "Stores", href: "#" },
   ],
-}
+};
 
 export default function Navigation() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  const [openAuthModal, setOpenAuthModal] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openUserMenu = Boolean(anchorEl);
+  const jwt = localStorage.getItem("jwt");
+
+  const handleUserClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = (event) => {
+    setAnchorEl(null);
+  };
+
+  const handleOpen = () => {
+    setOpenAuthModal(true);
+  };
+
+  const handleClose = () => {
+    setOpenAuthModal(false);
+  };
   const handleCategoryClick = (category, section, item, close) => {
     // Navigating using the new item.id property
-    navigate(`/${category.id}/${section.id}/${item.id}`); 
+    navigate(`/${category.id}/${section.id}/${item.id}`);
     close();
   };
 
@@ -196,7 +229,10 @@ export default function Navigation() {
           Get free delivery on orders over $100
         </p>
 
-        <nav aria-label="Top" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <nav
+          aria-label="Top"
+          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+        >
           <div className="border-b border-gray-200">
             <div className="flex h-16 items-center">
               <button
@@ -242,20 +278,32 @@ export default function Navigation() {
                         {({ close }) => (
                           <Fragment>
                             {/* Presentational element used to render the bottom shadow... */}
-                            <div aria-hidden="true" className="absolute inset-0 top-1/2 bg-white shadow-sm" />
+                            <div
+                              aria-hidden="true"
+                              className="absolute inset-0 top-1/2 bg-white shadow-sm"
+                            />
                             <div className="relative bg-white">
                               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                                 <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
                                   <div className="col-start-2 grid grid-cols-2 gap-x-8">
                                     {category.featured.map((item) => (
-                                      <div key={item.name} className="group relative text-base sm:text-sm">
+                                      <div
+                                        key={item.name}
+                                        className="group relative text-base sm:text-sm"
+                                      >
                                         <img
                                           alt={item.imageAlt}
                                           src={item.imageSrc}
                                           className="aspect-square w-full rounded-lg bg-gray-100 object-cover group-hover:opacity-75"
                                         />
-                                        <a href={item.href} className="mt-6 block font-medium text-gray-900">
-                                          <span aria-hidden="true" className="absolute inset-0 z-10" />
+                                        <a
+                                          href={item.href}
+                                          className="mt-6 block font-medium text-gray-900"
+                                        >
+                                          <span
+                                            aria-hidden="true"
+                                            className="absolute inset-0 z-10"
+                                          />
                                           {item.name}
                                         </a>
                                         <p aria-hidden="true" className="mt-1">
@@ -267,7 +315,10 @@ export default function Navigation() {
                                   <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
                                     {category.sections.map((section) => (
                                       <div key={section.name}>
-                                        <p id={`${section.name}-heading`} className="font-medium text-gray-900">
+                                        <p
+                                          id={`${section.name}-heading`}
+                                          className="font-medium text-gray-900"
+                                        >
                                           {section.name}
                                         </p>
                                         <ul
@@ -276,9 +327,12 @@ export default function Navigation() {
                                           className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
                                         >
                                           {section.items.map((item) => (
-                                            <li key={item.name} className="flex">
-                                              <p 
-                                                onClick={() => 
+                                            <li
+                                              key={item.name}
+                                              className="flex"
+                                            >
+                                              <p
+                                                onClick={() =>
                                                   handleCategoryClick(
                                                     category,
                                                     section,
@@ -286,7 +340,7 @@ export default function Navigation() {
                                                     close
                                                   )
                                                 }
-                                                className='cursor-pointer hover:text-gray-800'
+                                                className="cursor-pointer hover:text-gray-800"
                                               >
                                                 {item.name}
                                               </p>
@@ -317,101 +371,146 @@ export default function Navigation() {
               </PopoverGroup>
 
               {/* Profile Menu, Search, and Cart */}
-              <div className="ml-auto flex items-center">
-                {/* 🚀 ADDED: Headless UI Menu for Profile Icon Dropdown */}
-                <Menu as="div" className="relative z-30">
-                  <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">Open user menu</span>
-                    {/* The MUI Avatar is now inside the MenuButton */}
-                    <Avatar
-                      className='text-white'
-                      sx={{
-                        bgcolor:'purple',
-                        color: 'white',
-                        cursor: 'pointer',
-                        width: 32,
-                        height: 32,
-                      }}
+              {/* Profile Menu, Search, Cart, and SignIn aligned to right */}
+              <div className="ml-auto flex items-center space-x-4">
+                {false ? (
+                  <>
+                    {/* 🚀 Profile Dropdown */}
+                    <Menu as="div" className="relative z-30">
+                      <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <Avatar
+                          className="text-white"
+                          sx={{
+                            bgcolor: "purple",
+                            color: "white",
+                            cursor: "pointer",
+                            width: 32,
+                            height: 32,
+                          }}
+                        >
+                          R
+                        </Avatar>
+                      </MenuButton>
+
+                      <MenuItems
+                        transition
+                        className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5"
+                      >
+                        <MenuItem>
+                          {({ focus }) => (
+                            <a
+                              href="#"
+                              onClick={() => handleMenuClick("/profile")}
+                              className={`block px-4 py-2 text-sm text-gray-700 ${
+                                focus ? "bg-gray-100" : ""
+                              }`}
+                            >
+                              Profile
+                            </a>
+                          )}
+                        </MenuItem>
+
+                        <MenuItem>
+                          {({ focus }) => (
+                            <a
+                              href="#"
+                              onClick={() => handleMenuClick("/account/order")}
+                              className={`block px-4 py-2 text-sm text-gray-700 ${
+                                focus ? "bg-gray-100" : ""
+                              }`}
+                            >
+                              My Orders
+                            </a>
+                          )}
+                        </MenuItem>
+
+                        <MenuItem>
+                          {({ focus }) => (
+                            <a
+                              href="#"
+                              onClick={() => handleMenuClick("/logout")}
+                              className={`block px-4 py-2 text-sm text-gray-700 ${
+                                focus ? "bg-gray-100" : ""
+                              }`}
+                            >
+                              Logout
+                            </a>
+                          )}
+                        </MenuItem>
+                      </MenuItems>
+                    </Menu>
+
+                    {/* Search */}
+                    <div className="flex">
+                      <a
+                        href="#"
+                        className="p-2 text-gray-400 hover:text-gray-500"
+                      >
+                        <MagnifyingGlassIcon
+                          aria-hidden="true"
+                          className="size-6"
+                        />
+                      </a>
+                    </div>
+
+                    {/* Cart */}
+                    <div className="flow-root">
+                      <a href="#" className="group -m-2 flex items-center p-2">
+                        <ShoppingBagIcon
+                          aria-hidden="true"
+                          className="size-6 shrink-0 text-gray-400 group-hover:text-gray-500"
+                        />
+                        <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                          0
+                        </span>
+                      </a>
+                    </div>
+                  </>
+                ) : (
+                  <div className="ml-auto flex items-center space-x-6">
+                    {/* SignIN button */}
+                    <Button
+                      onClick={handleOpen}
+                      variant="text"
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
                     >
-                      R
-                    </Avatar>
-                  </MenuButton>
-                  <MenuItems
-                    transition
-                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                  >
-                    <MenuItem>
-                      {({ focus }) => (
-                        <a
-                          href="#"
-                          onClick={() => handleMenuClick('/profile')}
-                          className={classNames(
-                            focus ? 'bg-gray-100' : '',
-                            'block px-4 py-2 text-sm text-gray-700'
-                          )}
-                        >
-                          Profile
-                        </a>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ focus }) => (
-                        <a
-                          href="#"
-                          onClick={() => handleMenuClick('/account/order')}
-                          className={classNames(
-                            focus ? 'bg-gray-100' : '',
-                            'block px-4 py-2 text-sm text-gray-700'
-                          )}
-                        >
-                          My Orders
-                        </a>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ focus }) => (
-                        <a
-                          href="#"
-                          onClick={() => handleMenuClick('/logout')} // You'd put your logout logic here
-                          className={classNames(
-                            focus ? 'bg-gray-100' : '',
-                            'block px-4 py-2 text-sm text-gray-700'
-                          )}
-                        >
-                          Logout
-                        </a>
-                      )}
-                    </MenuItem>
-                  </MenuItems>
-                </Menu>
-                {/* 🛑 END of Profile Menu */}
+                      SignIn
+                    </Button>
 
-                {/* Search */}
-                <div className="flex lg:ml-6">
-                  <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
-                    <span className="sr-only">Search</span>
-                    <MagnifyingGlassIcon aria-hidden="true" className="size-6" />
-                  </a>
-                </div>
+                    {/* Search */}
+                    <div className="flex">
+                      <a
+                        href="#"
+                        className="p-2 text-gray-400 hover:text-gray-500"
+                      >
+                        <MagnifyingGlassIcon
+                          aria-hidden="true"
+                          className="size-6"
+                        />
+                      </a>
+                    </div>
 
-                {/* Cart */}
-                <div className="ml-4 flow-root lg:ml-6">
-                  <a href="#" className="group -m-2 flex items-center p-2">
-                    <ShoppingBagIcon
-                      aria-hidden="true"
-                      className="size-6 shrink-0 text-gray-400 group-hover:text-gray-500"
-                    />
-                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">0</span>
-                    <span className="sr-only">items in cart, view bag</span>
-                  </a>
-                </div>
-              
+                    {/* Cart */}
+                    <div className="flow-root">
+                      <a href="#" className="group -m-2 flex items-center p-2">
+                        <ShoppingBagIcon
+                          aria-hidden="true"
+                          className="size-6 shrink-0 text-gray-400 group-hover:text-gray-500"
+                        />
+                        <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+                          0
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </nav>
       </header>
+
+      <AuthModal handleClose={handleClose} open={openAuthModal} />
     </div>
-  )
+  );
 }
