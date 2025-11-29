@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -26,9 +26,12 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Avatar from "@mui/material/Avatar";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthModal from "../../Auth/AuthModal";
 import { Button } from "@mui/material";
+import { store } from "../../../State/Store";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, logout } from "../../../State/Auth/Action";
 
 // Helper function for conditionally joining class names
 function classNames(...classes) {
@@ -179,6 +182,9 @@ export default function Navigation() {
   const [anchorEl, setAnchorEl] = useState(null);
   const openUserMenu = Boolean(anchorEl);
   const jwt = localStorage.getItem("jwt");
+  const { auth } = useSelector((store) => store);
+  const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleUserClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -205,6 +211,27 @@ export default function Navigation() {
     // Basic navigation logic for the profile menu
     navigate(route);
   };
+
+  const handleLogOut = () => {
+    dispatch(logout());
+    handleCloseUserMenu();
+  };
+
+  useEffect(() => {
+    if (jwt) {
+      dispatch(getUser());
+    }
+  }, [jwt, auth.jwt]);
+
+  useEffect(() => {
+    if (auth.user) {
+      handleClose();
+    }
+
+    if (location.pathname === "/login" || location.pathname === "/register") {
+      navigate(-1);
+    }
+  }, [auth.user]);
 
   return (
     <div className="bg-white">
@@ -373,7 +400,7 @@ export default function Navigation() {
               {/* Profile Menu, Search, and Cart */}
               {/* Profile Menu, Search, Cart, and SignIn aligned to right */}
               <div className="ml-auto flex items-center space-x-4">
-                {false ? (
+                {auth.user?.firstName ? (
                   <>
                     {/* 🚀 Profile Dropdown */}
                     <Menu as="div" className="relative z-30">
@@ -388,7 +415,7 @@ export default function Navigation() {
                             height: 32,
                           }}
                         >
-                          R
+                          {auth.user.firstName[0].toUpperCase()}
                         </Avatar>
                       </MenuButton>
 
@@ -428,7 +455,7 @@ export default function Navigation() {
                           {({ focus }) => (
                             <a
                               href="#"
-                              onClick={() => handleMenuClick("/logout")}
+                              onClick={() => handleLogOut()}
                               className={`block px-4 py-2 text-sm text-gray-700 ${
                                 focus ? "bg-gray-100" : ""
                               }`}
