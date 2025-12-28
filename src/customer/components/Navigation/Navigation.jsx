@@ -5,35 +5,28 @@ import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
-  Menu, // 👈 Used for the Profile dropdown
-  MenuButton, // 👈 Button for the Profile dropdown
-  MenuItem, // 👈 Menu item links
-  MenuItems, // 👈 Container for menu items
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
   Popover,
-  PopoverButton,
   PopoverGroup,
   PopoverPanel,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
 } from "@headlessui/react";
 import {
   Bars3Icon,
   MagnifyingGlassIcon,
   ShoppingBagIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Avatar from "@mui/material/Avatar";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthModal from "../../Auth/AuthModal";
 import { Button } from "@mui/material";
-import { store } from "../../../State/Store";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser, logout } from "../../../State/Auth/Action";
+import { getUser, logout, clearAuthError } from "../../../State/Auth/Action";
+import Snackbar from '@mui/material/Snackbar'
+import Alert from '@mui/material/Alert'
 
-// Helper function for conditionally joining class names
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -66,7 +59,6 @@ const navigation = {
           id: "clothing",
           name: "Clothing",
           items: [
-            // UPDATED: Added 'id' fields
             { name: "Tops", id: "tops", href: "#" },
             { name: "Dresses", id: "dresses", href: "#" },
             { name: "Pants", id: "pants", href: "#" },
@@ -76,31 +68,6 @@ const navigation = {
             { name: "Jackets", id: "jackets", href: "#" },
             { name: "Activewear", id: "activewear", href: "#" },
             { name: "Browse All", id: "browse-all", href: "#" },
-          ],
-        },
-        {
-          id: "accessories",
-          name: "Accessories",
-          items: [
-            // UPDATED: Added 'id' fields
-            { name: "Watches", id: "watches", href: "#" },
-            { name: "Wallets", id: "wallets", href: "#" },
-            { name: "Bags", id: "bags", href: "#" },
-            { name: "Sunglasses", id: "sunglasses", href: "#" },
-            { name: "Hats", id: "hats", href: "#" },
-            { name: "Belts", id: "belts", href: "#" },
-          ],
-        },
-        {
-          id: "brands",
-          name: "Brands",
-          items: [
-            // UPDATED: Added 'id' fields
-            { name: "Full Nelson", id: "full-nelson", href: "#" },
-            { name: "My Way", id: "my-way", href: "#" },
-            { name: "Re-Arranged", id: "re-arranged", href: "#" },
-            { name: "Counterfeit", id: "counterfeit", href: "#" },
-            { name: "Significant Other", id: "significant-other", href: "#" },
           ],
         },
       ],
@@ -131,38 +98,13 @@ const navigation = {
           id: "clothing",
           name: "Clothing",
           items: [
-            // UPDATED: Added 'id' fields
-            { name: "Tops", id: "tops", href: "#" },
+            { name: "Mens Kurta", id: "mens_kurta", href: "#" },
             { name: "Pants", id: "pants", href: "#" },
             { name: "Sweaters", id: "sweaters", href: "#" },
             { name: "T-Shirts", id: "t-shirts", href: "#" },
             { name: "Jackets", id: "jackets", href: "#" },
             { name: "Activewear", id: "activewear", href: "#" },
             { name: "Browse All", id: "browse-all", href: "#" },
-          ],
-        },
-        {
-          id: "accessories",
-          name: "Accessories",
-          items: [
-            // UPDATED: Added 'id' fields
-            { name: "Watches", id: "watches", href: "#" },
-            { name: "Wallets", id: "wallets", href: "#" },
-            { name: "Bags", id: "bags", href: "#" },
-            { name: "Sunglasses", id: "sunglasses", href: "#" },
-            { name: "Hats", id: "hats", href: "#" },
-            { name: "Belts", id: "belts", href: "#" },
-          ],
-        },
-        {
-          id: "brands",
-          name: "Brands",
-          items: [
-            // UPDATED: Added 'id' fields
-            { name: "Re-Arranged", id: "re-arranged", href: "#" },
-            { name: "Counterfeit", id: "counterfeit", href: "#" },
-            { name: "Full Nelson", id: "full-nelson", href: "#" },
-            { name: "My Way", id: "my-way", href: "#" },
           ],
         },
       ],
@@ -177,39 +119,82 @@ const navigation = {
 export default function Navigation() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const openUserMenu = Boolean(anchorEl);
-  const jwt = localStorage.getItem("jwt");
-  const { auth } = useSelector((store) => store);
   const dispatch = useDispatch();
   const location = useLocation();
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+
+  // ✅ Correct useSelector to only get auth slice
+  const auth = useSelector((state) => state.auth);
 
   const handleUserClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleCloseUserMenu = (event) => {
+  const handleCloseUserMenu = () => {
     setAnchorEl(null);
   };
 
   const handleOpen = () => {
     setOpenAuthModal(true);
+    // Push a route so the modal can be deep-linked to
+    if (location.pathname !== "/login" && location.pathname !== "/register") {
+      navigate("/login");
+    }
   };
 
   const handleClose = () => {
     setOpenAuthModal(false);
+    // When modal closes, go back if we're on a auth route to keep URL in sync
+    if (location.pathname === "/login" || location.pathname === "/register") {
+      navigate(-1);
+    }
   };
+
   const handleCategoryClick = (category, section, item, close) => {
-    // Navigating using the new item.id property
     navigate(`/${category.id}/${section.id}/${item.id}`);
     close();
   };
 
   const handleMenuClick = (route) => {
-    // Basic navigation logic for the profile menu
     navigate(route);
+    handleCloseUserMenu();
+  };
+
+  // Robust admin detection: backend may return role/isAdmin in different shapes
+  const isAdminUser = (user) => {
+    if (!user) return false;
+    if (user.isAdmin) return true;
+    if (user.role && (user.role === "admin" || user.role === "ROLE_ADMIN")) return true;
+    if (Array.isArray(user.roles)) {
+      for (const r of user.roles) {
+        if (!r) continue;
+        if (typeof r === "string") {
+          const s = r.toLowerCase();
+          if (s === "admin" || s === "role_admin" || s === "roleadmin" || s === "administrator") return true;
+        }
+        if (typeof r === "object") {
+          if (r.name && (r.name.toLowerCase() === "admin" || r.name === "ROLE_ADMIN")) return true;
+          if (r.role && (r.role.toLowerCase() === "admin" || r.role === "ROLE_ADMIN")) return true;
+        }
+      }
+    }
+    if (Array.isArray(user.authorities)) {
+      for (const a of user.authorities) {
+        if (!a) continue;
+        if (typeof a === "string") {
+          const s = a.toLowerCase();
+          if (s === "role_admin" || s === "roleadmin" || s === "admin") return true;
+        }
+        if (typeof a === "object") {
+          if (a.authority && (a.authority === "ROLE_ADMIN" || a.authority.toLowerCase() === "admin")) return true;
+          if (a.name && (a.name.toLowerCase() === "admin")) return true;
+        }
+      }
+    }
+    return false;
   };
 
   const handleLogOut = () => {
@@ -218,35 +203,41 @@ export default function Navigation() {
   };
 
   useEffect(() => {
+    const jwt = localStorage.getItem("jwt");
     if (jwt) {
       dispatch(getUser());
     }
-  }, [jwt, auth.jwt]);
+  }, [dispatch]);
+
+    useEffect(() => {
+      if (auth.error) setOpenErrorSnackbar(true);
+      else setOpenErrorSnackbar(false);
+    }, [auth.error]);
 
   useEffect(() => {
-    if (auth.user) {
-      handleClose();
-    }
-
+    if (auth.user) handleClose();
+    // Open modal when route is /login or /register, otherwise ensure it's closed
     if (location.pathname === "/login" || location.pathname === "/register") {
-      navigate(-1);
+      setOpenAuthModal(true);
+    } else {
+      setOpenAuthModal(false);
     }
-  }, [auth.user]);
+  }, [auth.user, location.pathname, navigate]);
+
+    const handleCloseErrorSnackbar = (event, reason) => {
+      if (reason === 'clickaway') return;
+      setOpenErrorSnackbar(false);
+      dispatch(clearAuthError());
+    };
 
   return (
     <div className="bg-white">
-      {/* Mobile menu (omitted for brevity, assume similar structure is maintained) */}
+      {/* Mobile menu */}
       <Dialog open={open} onClose={setOpen} className="relative z-40 lg:hidden">
-        <DialogBackdrop
-          transition
-          className="fixed inset-0 bg-black/25 transition-opacity duration-300 ease-linear data-closed:opacity-0"
-        />
+        <DialogBackdrop className="fixed inset-0 bg-black/25" />
         <div className="fixed inset-0 z-40 flex">
-          <DialogPanel
-            transition
-            className="relative flex w-full max-w-xs transform flex-col overflow-y-auto bg-white pb-12 shadow-xl transition duration-300 ease-in-out data-closed:-translate-x-full"
-          >
-            {/* ... Mobile menu content ... */}
+          <DialogPanel className="relative flex w-full max-w-xs flex-col overflow-y-auto bg-white pb-12 shadow-xl">
+            {/* Mobile menu content */}
           </DialogPanel>
         </div>
       </Dialog>
@@ -256,10 +247,7 @@ export default function Navigation() {
           Get free delivery on orders over $100
         </p>
 
-        <nav
-          aria-label="Top"
-          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
-        >
+        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="border-b border-gray-200">
             <div className="flex h-16 items-center">
               <button
@@ -267,9 +255,8 @@ export default function Navigation() {
                 onClick={() => setOpen(true)}
                 className="relative rounded-md bg-white p-2 text-gray-400 lg:hidden"
               >
-                <span className="absolute -inset-0.5" />
                 <span className="sr-only">Open menu</span>
-                <Bars3Icon aria-hidden="true" className="size-6" />
+                <Bars3Icon aria-hidden="true" className="h-6 w-6" />
               </button>
 
               {/* Logo */}
@@ -290,82 +277,44 @@ export default function Navigation() {
                   {navigation.categories.map((category) => (
                     <Popover key={category.name} className="flex">
                       <div className="relative flex">
-                        <PopoverButton className="group relative flex items-center justify-center text-sm font-medium text-gray-700 transition-colors duration-200 ease-out hover:text-gray-800 data-open:text-indigo-600">
+                        <Popover.Button className="group relative flex items-center justify-center text-sm font-medium text-gray-700 hover:text-gray-800">
                           {category.name}
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-x-0 -bottom-px z-30 h-0.5 transition duration-200 ease-out group-data-open:bg-indigo-600"
-                          />
-                        </PopoverButton>
+                          <span className="absolute inset-x-0 -bottom-px h-0.5 transition duration-200 ease-out group-data-open:bg-indigo-600" />
+                        </Popover.Button>
                       </div>
-                      <PopoverPanel
-                        transition
-                        className="absolute inset-x-0 top-full z-20 w-full bg-white text-sm text-gray-500 transition data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in"
-                      >
+                      <Popover.Panel className="absolute inset-x-0 top-full z-20 w-full bg-white text-sm text-gray-500">
                         {({ close }) => (
                           <Fragment>
-                            {/* Presentational element used to render the bottom shadow... */}
-                            <div
-                              aria-hidden="true"
-                              className="absolute inset-0 top-1/2 bg-white shadow-sm"
-                            />
+                            <div aria-hidden="true" className="absolute inset-0 top-1/2 bg-white shadow-sm" />
                             <div className="relative bg-white">
                               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                                 <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
                                   <div className="col-start-2 grid grid-cols-2 gap-x-8">
                                     {category.featured.map((item) => (
-                                      <div
-                                        key={item.name}
-                                        className="group relative text-base sm:text-sm"
-                                      >
+                                      <div key={item.name} className="group relative text-base sm:text-sm">
                                         <img
                                           alt={item.imageAlt}
                                           src={item.imageSrc}
                                           className="aspect-square w-full rounded-lg bg-gray-100 object-cover group-hover:opacity-75"
                                         />
-                                        <a
-                                          href={item.href}
-                                          className="mt-6 block font-medium text-gray-900"
-                                        >
-                                          <span
-                                            aria-hidden="true"
-                                            className="absolute inset-0 z-10"
-                                          />
+                                        <a href={item.href} className="mt-6 block font-medium text-gray-900">
+                                          <span aria-hidden="true" className="absolute inset-0 z-10" />
                                           {item.name}
                                         </a>
-                                        <p aria-hidden="true" className="mt-1">
-                                          Shop now
-                                        </p>
+                                        <p aria-hidden="true" className="mt-1">Shop now</p>
                                       </div>
                                     ))}
                                   </div>
                                   <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
                                     {category.sections.map((section) => (
                                       <div key={section.name}>
-                                        <p
-                                          id={`${section.name}-heading`}
-                                          className="font-medium text-gray-900"
-                                        >
-                                          {section.name}
-                                        </p>
-                                        <ul
-                                          role="list"
-                                          aria-labelledby={`${section.name}-heading`}
-                                          className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
-                                        >
+                                        <p className="font-medium text-gray-900">{section.name}</p>
+                                        <ul className="mt-6 space-y-6 sm:mt-4 sm:space-y-4">
                                           {section.items.map((item) => (
-                                            <li
-                                              key={item.name}
-                                              className="flex"
-                                            >
+                                            <li key={item.name} className="flex">
                                               <p
                                                 onClick={() =>
-                                                  handleCategoryClick(
-                                                    category,
-                                                    section,
-                                                    item,
-                                                    close
-                                                  )
+                                                  handleCategoryClick(category, section, item, close)
                                                 }
                                                 className="cursor-pointer hover:text-gray-800"
                                               >
@@ -382,7 +331,7 @@ export default function Navigation() {
                             </div>
                           </Fragment>
                         )}
-                      </PopoverPanel>
+                      </Popover.Panel>
                     </Popover>
                   ))}
                   {navigation.pages.map((page) => (
@@ -397,68 +346,60 @@ export default function Navigation() {
                 </div>
               </PopoverGroup>
 
-              {/* Profile Menu, Search, and Cart */}
-              {/* Profile Menu, Search, Cart, and SignIn aligned to right */}
+              {/* Right-aligned profile/search/cart */}
               <div className="ml-auto flex items-center space-x-4">
                 {auth.user?.firstName ? (
                   <>
-                    {/* 🚀 Profile Dropdown */}
                     <Menu as="div" className="relative z-30">
-                      <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        <Avatar
-                          className="text-white"
-                          sx={{
-                            bgcolor: "purple",
-                            color: "white",
-                            cursor: "pointer",
-                            width: 32,
-                            height: 32,
-                          }}
-                        >
+                      <MenuButton className="relative flex max-w-xs items-center rounded-full bg-white text-sm">
+                        <Avatar sx={{ bgcolor: "purple", width: 32, height: 32 }}>
                           {auth.user.firstName[0].toUpperCase()}
                         </Avatar>
                       </MenuButton>
-
-                      <MenuItems
-                        transition
-                        className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5"
-                      >
+                      <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                         <MenuItem>
                           {({ focus }) => (
                             <a
                               href="#"
                               onClick={() => handleMenuClick("/profile")}
-                              className={`block px-4 py-2 text-sm text-gray-700 ${
-                                focus ? "bg-gray-100" : ""
-                              }`}
+                              className={`block px-4 py-2 text-sm text-gray-700 ${focus ? "bg-gray-100" : ""}`}
                             >
                               Profile
                             </a>
                           )}
                         </MenuItem>
 
+                        {/* Admin Dashboard - visible only for admin users */}
+                        {isAdminUser(auth.user) && (
+                          <MenuItem>
+                            {({ focus }) => (
+                              <a
+                                href="#"
+                                onClick={() => handleMenuClick("/admin")}
+                                className={`block px-4 py-2 text-sm text-gray-700 ${focus ? "bg-gray-100" : ""}`}
+                              >
+                                Admin Dashboard
+                              </a>
+                            )}
+                          </MenuItem>
+                        )}
                         <MenuItem>
                           {({ focus }) => (
                             <a
                               href="#"
                               onClick={() => handleMenuClick("/account/order")}
-                              className={`block px-4 py-2 text-sm text-gray-700 ${
-                                focus ? "bg-gray-100" : ""
-                              }`}
+                              className={`block px-4 py-2 text-sm text-gray-700 ${focus ? "bg-gray-100" : ""}`}
                             >
                               My Orders
                             </a>
                           )}
                         </MenuItem>
-
                         <MenuItem>
                           {({ focus }) => (
                             <a
                               href="#"
-                              onClick={() => handleLogOut()}
-                              className={`block px-4 py-2 text-sm text-gray-700 ${
-                                focus ? "bg-gray-100" : ""
-                              }`}
+                              onClick={handleLogOut}
+                              className={`block px-4 py-2 text-sm text-gray-700 ${focus ? "bg-gray-100" : ""}`}
                             >
                               Logout
                             </a>
@@ -466,69 +407,20 @@ export default function Navigation() {
                         </MenuItem>
                       </MenuItems>
                     </Menu>
-
-                    {/* Search */}
                     <div className="flex">
-                      <a
-                        href="#"
-                        className="p-2 text-gray-400 hover:text-gray-500"
-                      >
-                        <MagnifyingGlassIcon
-                          aria-hidden="true"
-                          className="size-6"
-                        />
-                      </a>
+                      <MagnifyingGlassIcon className="h-6 w-6 text-gray-400 hover:text-gray-500" />
                     </div>
-
-                    {/* Cart */}
                     <div className="flow-root">
-                      <a href="#" className="group -m-2 flex items-center p-2">
-                        <ShoppingBagIcon
-                          aria-hidden="true"
-                          className="size-6 shrink-0 text-gray-400 group-hover:text-gray-500"
-                        />
-                        <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                          0
-                        </span>
-                      </a>
+                      <ShoppingBagIcon className="h-6 w-6 text-gray-400 hover:text-gray-500" />
                     </div>
                   </>
                 ) : (
                   <div className="ml-auto flex items-center space-x-6">
-                    {/* SignIN button */}
-                    <Button
-                      onClick={handleOpen}
-                      variant="text"
-                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
-                    >
+                    <Button onClick={handleOpen} variant="text" className="text-sm text-gray-700 hover:text-gray-900">
                       SignIn
                     </Button>
-
-                    {/* Search */}
-                    <div className="flex">
-                      <a
-                        href="#"
-                        className="p-2 text-gray-400 hover:text-gray-500"
-                      >
-                        <MagnifyingGlassIcon
-                          aria-hidden="true"
-                          className="size-6"
-                        />
-                      </a>
-                    </div>
-
-                    {/* Cart */}
-                    <div className="flow-root">
-                      <a href="#" className="group -m-2 flex items-center p-2">
-                        <ShoppingBagIcon
-                          aria-hidden="true"
-                          className="size-6 shrink-0 text-gray-400 group-hover:text-gray-500"
-                        />
-                        <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                          0
-                        </span>
-                      </a>
-                    </div>
+                    <MagnifyingGlassIcon className="h-6 w-6 text-gray-400 hover:text-gray-500" />
+                    <ShoppingBagIcon className="h-6 w-6 text-gray-400 hover:text-gray-500" />
                   </div>
                 )}
               </div>
@@ -538,6 +430,11 @@ export default function Navigation() {
       </header>
 
       <AuthModal handleClose={handleClose} open={openAuthModal} />
+      <Snackbar open={openErrorSnackbar} autoHideDuration={6000} onClose={handleCloseErrorSnackbar}>
+        <Alert onClose={handleCloseErrorSnackbar} severity="error" sx={{ width: '100%' }}>
+          {auth.error}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

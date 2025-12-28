@@ -1,12 +1,13 @@
-import { Button, Grid, TextField } from "@mui/material";
+import { Button, Grid, TextField, CircularProgress, Alert } from "@mui/material";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../State/Auth/Action";
 const LoginForm = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -48,21 +49,34 @@ const LoginForm = () => {
             variant="contained"
             size="large"
             fullWidth
+            disabled={auth.isLoading}
             sx={{
               backgroundColor: "#9155FD",
               padding: ".8rem 0",
               "&:hover": { backgroundColor: "#7b46d9" },
             }}
           >
-            Log IN
+            {auth.isLoading ? (
+              <>
+                <CircularProgress color="inherit" size={18} sx={{ mr: 1 }} /> Logging in...
+              </>
+            ) : (
+              "Log IN"
+            )}
           </Button>
         </Grid>
       </form>
 
+      {auth.error && (
+        <div className="mt-4">
+          <Alert severity="error">{auth.error}</Alert>
+        </div>
+      )}
+
             <div className="flex justify-center flex-col items-center">
               <div className="py-3 flex items-center">
                 <p>Don't have an account?</p>
-                <Button onClick={()=> navigate("/register")} className="ml-5" size="small">Register</Button>
+                <Button onClick={()=> navigate("/register", { replace: true })} className="ml-5" size="small">Register</Button>
               </div>
             </div>
     </div>

@@ -1,6 +1,7 @@
 import axios from "axios"
 import { API_BASE_URL } from "../../config/apiConfig"
 import { GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS } from "./ActionType"
+import { CLEAR_AUTH_ERROR } from "./ActionType"
 
 
 const registerRequest = () => ({type:REGISTER_REQUEST});
@@ -24,6 +25,8 @@ export const register = (userData) => async (dispatch) => {
         console.log("GET_USER",user)
 
         dispatch(registerSuccess(user.jwt))
+        // After successful signup, fetch the user's profile so UI updates accordingly
+        dispatch(getUser())
     }catch(error) {
         dispatch(registerFailure(error.message))
         console.log(error)
@@ -46,7 +49,10 @@ export const login = (userData) => async (dispatch) => {
         if(user.jwt){
             localStorage.setItem("jwt",user.jwt)
         }
+        console.log("LOGIN_USER",user)
         dispatch(loginSuccess(user.jwt))
+        // Fetch the authenticated user's profile so UI components depending on `auth.user` update
+        dispatch(getUser())
     }catch(error) {
         dispatch(loginFailure(error.message))
         console.log(error)
@@ -84,4 +90,8 @@ export const getUser = (userData) => async (dispatch) => {
 export const logout = () => (dispatch) => {
     dispatch({type:LOGOUT,payload:null})
     localStorage.clear()
+}
+
+export const clearAuthError = () => (dispatch) => {
+    dispatch({ type: CLEAR_AUTH_ERROR })
 }

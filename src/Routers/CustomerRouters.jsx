@@ -24,7 +24,7 @@ const CustomerRouters = () => {
 
             <Route path='/' element={<HomePage/>}></Route>
             <Route path='/cart' element={<Cart/>}></Route>
-            <Route path='/:lavelOne/:lavelTwo/:lavelThree' element={<Product/>}></Route>
+            <Route path='/:levelOne/:levelTwo/:levelThree' element={<Product/>}></Route>
             <Route path='/product/:productId' element={<ProductDetails/>}></Route>
             <Route path='/checkout' element={<Checkout/>}></Route>
             <Route path='/account/order' element={<Order/>}></Route>
@@ -38,3 +38,7 @@ const CustomerRouters = () => {
 }
 
 export default CustomerRouters
+
+
+
+
