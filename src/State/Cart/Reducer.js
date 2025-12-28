@@ -43,8 +43,9 @@ export const cartReducer = (state = initialState, action) => {
       return {
         ...state,
         cartItems: action.payload.cartItems,
-        cart: action.payload.cartItems,
-        cart: action.payload,
+        // keep `cart` shaped as an object that contains `cart` key so
+        // components that use `cart.cart?.cartItems` continue to work.
+        cart: { ...action.payload },
         loading: false,
       };
     case GET_CART_FAILURE:

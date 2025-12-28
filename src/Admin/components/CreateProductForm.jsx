@@ -34,7 +34,7 @@ const CreateProductForm = () => {
     quantity: "",
     price: "",
     discountedPrice: "",
-    discountPersent: "",
+    discountPercent: "",
     topLevelCategory: "",
     secondLevelCategory: "",
     thirdLevelCategory: "",
@@ -79,8 +79,8 @@ const CreateProductForm = () => {
         price: Number(productData.price) || 0,
         discountedPrice: Number(productData.discountedPrice) || 0,
         // send both spellings to be safe (backend may expect discountPercent)
-        discountPercent: Number(productData.discountPersent) || 0,
-        discountPersent: productData.discountPersent,
+        discountPercent: Number(productData.discountPercent) || 0,
+        discountPercent: productData.discountPercent,
         size: productData.size.map((s) => ({ name: s.name, quantity: Number(s.quantity) || 0 })),
       };
 
@@ -95,7 +95,7 @@ const CreateProductForm = () => {
         quantity: "",
         price: "",
         discountedPrice: "",
-        discountPersent: "",
+        discountPercent: "",
         topLevelCategory: "",
         secondLevelCategory: "",
         thirdLevelCategory: "",
@@ -222,8 +222,8 @@ const CreateProductForm = () => {
                 fullWidth
                 label="Discount %"
                 type="number"
-                name="discountPersent"
-                value={productData.discountPersent}
+                name="discountPercent"
+                value={productData.discountPercent}
                 onChange={handleChange}
               />
             </Grid>

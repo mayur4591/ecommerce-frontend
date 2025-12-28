@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import { useLocation } from 'react-router-dom';
 import DeliveryAddressForm from './DeliveryAddressForm';
 import OrderSummary from './OrderSummary';
+import Payment from './Payment';
 
 const steps = ['Login', 'Delevery address',"Order Summary",'Payment'];
 
@@ -17,6 +18,7 @@ export default function Checkout() {
     const querySearch = new URLSearchParams(location.search)
 
     const step = querySearch.get("step")
+    const stepNum = parseInt(step, 10) || 0
 
 
     const handleNext = () => {
@@ -35,7 +37,7 @@ export default function Checkout() {
     return (
         <div className='px-10 lg:px-20'>
             <Box sx={{ width: '100%' }}>
-                <Stepper activeStep={step}>
+                <Stepper activeStep={stepNum}>
                     {steps.map((label, index) => {
                         const stepProps = {};
                         const labelProps = {};
@@ -66,7 +68,15 @@ export default function Checkout() {
 
                         </Box>
                         <div className='mt-10'>
-                            {step==2?<DeliveryAddressForm/>:<OrderSummary/>}
+                            {stepNum === 2 ? (
+                                <DeliveryAddressForm />
+                            ) : stepNum === 3 ? (
+                                <OrderSummary />
+                            ) : stepNum === 4 ? (
+                                <Payment />
+                            ) : (
+                                <DeliveryAddressForm />
+                            )}
                         </div>
                     </React.Fragment>
                 )}

@@ -29,21 +29,23 @@ export default function ProductDetails() {
     // ✅ ADD TO CART HANDLER
     const handleAddToCart = () => {
 
-        // Not logged in
-        if (!isAuthenticated) {
+        const hasSizes = !!(product?.sizes && product.sizes.length > 0);
+
+        // If product has sizes, require login first (show Snackbar if not)
+        if (hasSizes && !isAuthenticated) {
             setOpenLoginAlert(true);
             return;
         }
 
-        // ❗ Size not selected
-        if (!selectedSize) {
+        // If sizes are available, user must select one
+        if (hasSizes && !selectedSize) {
             alert("Please select a size.");
             return;
         }
 
         const data = {
             productId: params.productId,
-            sizes: selectedSize.name
+            sizes: selectedSize?.name || null
         };
 
         dispatch(addItemToCart(data));
@@ -90,7 +92,7 @@ export default function ProductDetails() {
                             <p className="font-semibold">Rs.{product?.discountedPrice}</p>
                             <p className="opacity-50 line-through">Rs.{product?.price}</p>
                             <p className="text-green-600 font-semibold">
-                                {product?.discountPersent}% Off
+                                {product?.discountPercent}% Off
                             </p>
                         </div>
 
